@@ -6,32 +6,63 @@
     <title>.NET Interview Questions</title>
     <link rel="icon" type="image/jpeg" href="images/logo.jpeg">
     <style>
+        /* General Styles */
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
+
+        /* Header Styles */
         header {
             background-color: #f0f0f0;
-            padding: 10px;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
         }
+
+        header img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        /* Main Content Styles */
+        main {
+            flex-grow: 1; /* Ensures main content takes up remaining space */
+            padding: 20px;
+        }
+
+        /* Footer Styles */
         footer {
             background-color: #212121; /* Similar to blue-900 */
             color: #d3d3d3; /* Similar to gray-300 */
-            padding: 10px;
             text-align: center;
-            width: 100%;
+            padding: 10px 20px;
         }
+
         footer a {
             color: #d3d3d3; /* Keep link color consistent */
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
+    <!-- Header -->
     <header>
+        <img src="images/logo.jpeg" alt="Site Logo">
         <h1>.NET Interview Questions</h1>
-        <img src="images/logo.jpeg" alt="Site Logo" width="100" height="100">
     </header>
+
+    <!-- Main Content -->
     <main>
         <p>This site is dedicated to providing answers to common .NET interview questions.</p>
         <ul>
@@ -40,10 +71,10 @@
             <li><a href="#">Question 3: What is ASP.NET?</a></li>
         </ul>
     </main>
+
+    <!-- Footer -->
     <footer>
-        <p class="text-sm">
-            &copy; 2025 Powered By <a href="https://coreconsultingit.com">CCIT</a>. All rights reserved
-        </p>
+        &copy; 2025 Powered By <a href="https://coreconsultingit.com">CCIT</a>. All rights reserved
     </footer>
 </body>
 </html>
