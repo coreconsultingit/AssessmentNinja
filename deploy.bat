@@ -25,7 +25,7 @@ for %%f in (*) do (
 
 :: Move React build files from dist folder to root directory
 echo Moving new build files to root directory...
-xcopy /E /I dotnet-interview-react\dist\* .
+xcopy /E /I /Y dotnet-interview-react\dist\* .
 
 :: Commit and push changes to GitHub
 echo Committing and pushing changes...
