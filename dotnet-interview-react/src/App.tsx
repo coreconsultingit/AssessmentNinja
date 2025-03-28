@@ -5,7 +5,7 @@ import Main from './components/Main';
 
 const App: React.FC = () => {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
       <Header />
       <Main />
       <Footer />
