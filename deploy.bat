@@ -10,7 +10,7 @@ npm run build
 :: Navigate back to root directory
 cd ..
 
-:: Remove existing static files in the root directory (except dotnet-interview-react folder)
+:: Remove all existing files in the root directory (except deploy.bat)
 echo Cleaning up old files in root directory...
 for /D %%d in (*) do (
     if not "%%d"=="dotnet-interview-react" (
@@ -26,6 +26,7 @@ for %%f in (*) do (
 :: Move React build files from dist folder to root directory
 echo Moving new build files to root directory...
 xcopy /E /I /Y dotnet-interview-react\dist\* .
+xcopy /Y dotnet-interview-react\dist\.nojekyll .
 
 :: Commit and push changes to GitHub
 echo Committing and pushing changes...
