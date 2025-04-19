@@ -1,4 +1,4 @@
 # DotNetInterview
-Repository for Dot net interview questions and answers
+Repository for assessemnt of your technical skills
 
 #run deploy.bat and commit the new files of assets folder
