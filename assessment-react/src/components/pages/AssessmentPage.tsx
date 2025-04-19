@@ -117,16 +117,16 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics }) => {
   };
 
   return (
-    <div className="w-full px-8 sm:px-6 lg:px-8 py-8">
+    <div className="w-full px-4 sm:px-8 lg:px-16 py-8">
       <Toaster />
-      
+
       <p className="text-gray-600 text-center mb-6">
         Practice mock technical interviews, get AI-powered evaluation, and improve your answers!
       </p>
 
       {/* Choose topic & difficulty */}
       {qaState.status === 'idle' && (
-        <Card className="max-w-md mx-auto">
+        <Card className="w-full max-w-4xl mx-auto">
           <CardHeader>
             <CardTitle>Start a New Assessment</CardTitle>
             <CardDescription>Choose a topic and difficulty level</CardDescription>
@@ -150,13 +150,15 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics }) => {
               </SelectContent>
             </Select>
           </CardContent>
-          <CardFooter><Button className="w-full" onClick={loadQuestions}>Start Assessment</Button></CardFooter>
+          <CardFooter>
+            <Button className="w-full" onClick={loadQuestions}>Start Assessment</Button>
+          </CardFooter>
         </Card>
       )}
 
       {/* Loading */}
       {qaState.status === 'loading' && (
-        <div className="text-center text-gray-500 flex items-center justify-center">
+        <div className="text-center text-gray-500 flex items-center justify-center mt-4">
           <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading questions...
         </div>
       )}
@@ -170,7 +172,7 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics }) => {
 
       {/* Answering questions */}
       {qaState.status === 'ready' && qaState.questions && results.length === 0 && (
-        <Card className="max-w-3xl mx-auto">
+        <Card className="w-full max-w-5xl mx-auto mt-6">
           <CardHeader>
             <CardTitle>Question {currentIndex + 1} of {qaState.questions.length}</CardTitle>
             <CardDescription>{qaState.questions[currentIndex]}</CardDescription>
@@ -202,7 +204,7 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics }) => {
 
       {/* Results Modal */}
       <Dialog open={isResultsModalOpen} onOpenChange={setResultsModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-full max-w-4xl">
           {isSubmitting ? (
             <div className="text-center py-4">
               <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4" />
@@ -219,7 +221,7 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics }) => {
 
               <div className="mb-4 mt-4 space-y-4">
                 {results.slice(0, 2).map((result, idx) => (
-                  <Card key={idx} className="bg-gray-50">
+                  <Card key={idx} className="bg-gray-50 w-full">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-semibold">Q: {qaState.questions?.[idx]}</CardTitle>
                     </CardHeader>
