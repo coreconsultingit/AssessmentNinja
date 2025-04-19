@@ -123,6 +123,8 @@ const App: React.FC = () => {
             <option value="python">Python</option>
             <option value="java">Java</option>
             <option value="csharp">C#</option>
+            <option value="Science Year-9">Science(Year9)</option>
+            <option value="Math Year-9">Math(Year9)</option>
           </select>
 
           <select
