@@ -1,15 +1,13 @@
 import React from 'react';
 
-const Footer: React.FC = () => {
+const Footer: React.FC<{ className?: string }> = ({ className }) => {
   return (
-    <footer style={{ backgroundColor: '#212121', color: '#d3d3d3', textAlign: 'center', padding: '10px 20px' }}>
-      <p>
-        &copy; 2025 Powered By{' '}
-        <a href="https://coreconsultingit.com" style={{ color: '#d3d3d3', textDecoration: 'none' }}>
-          CCIT
-        </a>
-        . All rights reserved
-      </p>
+    <footer className={`${className} w-full bg-blue-900 text-gray-300`}>
+      <div className="w-full px-4 py-2 text-center">
+        <p className="text-sm">
+          © 2024 Powered By <a  href="https://coreconsultingit.com">CCIT</a>. All rights reserved
+        </p>
+      </div>
     </footer>
   );
 };
