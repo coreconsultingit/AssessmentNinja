@@ -26,10 +26,12 @@ jobs:
         run: npm run build
         working-directory: ./assessment-react
 
-      - name: Configure git user for gh-pages
+      - name: Configure git for github-actions
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+        working-directory: ./assessment-react
 
       - name: Deploy to GitHub Pages
         run: npm run deploy
