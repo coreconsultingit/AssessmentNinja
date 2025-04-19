@@ -7,6 +7,6 @@ export const emailService = {
       subject,
       content
     };
-    return await ApiService.post('/interview/send-email', payload);
+    return await ApiService.post('/contact/send', payload);
   },
 };

@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import ErrorPage from '../components/ErrorPage';
 import HomePage from '../components/pages/Home';
+import ContactUs from '@/components/pages/ContactUs';
 export const router = createBrowserRouter(
   [
     {
@@ -16,6 +17,10 @@ export const router = createBrowserRouter(
         { 
           index: true, // Redirect root to Home
           element: <Navigate to="Home" replace /> 
+        },
+        { 
+          path: 'ContactUs', // Matches /DotNetInterview/Home
+          element: <ContactUs /> 
         },
         {
           path: '*',
