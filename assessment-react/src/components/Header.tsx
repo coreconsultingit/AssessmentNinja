@@ -5,6 +5,7 @@ const Header: React.FC<{ className?: string }> = ({ className }) => {
   const location = useLocation();
   const navItems = [
     { path: 'Home', label: 'Home' },
+    { path: 'Student', label: 'Student' },
     { path: 'contactus', label: 'Contact Us' }
   ];
   return (

@@ -88,7 +88,7 @@ const ContactUs: React.FC = () => {
       <Card className="max-w-7xl mx-auto bg-white shadow-xl">
         <CardHeader className="p-6 md:p-8 space-y-4">
           <CardTitle className="text-2xl md:text-3xl lg:text-4xl font-bold text-blue-800">
-            Looking for Data Analytics Solutions?
+            Looking for Assessment Solutions?
           </CardTitle>
           <CardDescription className="text-base md:text-lg text-gray-600">
             From property market insights to custom data analytics, our expert team is here to help transform your business needs into actionable solutions.
