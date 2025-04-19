@@ -23,10 +23,13 @@ for %%f in (*) do (
     )
 )
 
-:: Move React build files from dist folder to root directory
+:: Use ROBOCOPY to move React build files from dist folder to root directory
 echo Moving new build files to root directory...
-xcopy /E /I /Y assessment-react\dist\* .
-xcopy /Y assessment-react\dist\.nojekyll .
+robocopy "assessment-react\dist" "." /E /NFL /NDL /NJH /NJS /nc /ns /np
+
+:: Handle .nojekyll file separately with copy command and /H for hidden files
+echo Copying .nojekyll file...
+copy /Y "assessment-react\dist\.nojekyll" "." 2>nul
 
 :: Commit and push changes to GitHub
 echo Committing and pushing changes...
