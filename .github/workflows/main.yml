@@ -1,0 +1,45 @@
+name: Deploy React App to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./assessment-react
+
+      - name: Build
+        run: npm run build
+        working-directory: ./assessment-react
+
+      - name: Configure git for github-actions
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+        working-directory: ./assessment-react
+
+      - name: Deploy to GitHub Pages
+        run: |
+          npm run build
+          git checkout --orphan gh-pages # create a new orphan branch
+          git add -A
+          git commit -m "Deploy updated site"
+          git push origin gh-pages --force
+        working-directory: ./assessment-react
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
