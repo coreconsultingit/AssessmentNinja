@@ -18,8 +18,5 @@ export const router = createBrowserRouter(
         { path: '*', element: <ErrorPage /> },
       ]
     }
-  ],
-  {
-    basename: import.meta.env.VITE_BASE_URL || '/AssessmentNinja', 
-  }
+  ]
 );
