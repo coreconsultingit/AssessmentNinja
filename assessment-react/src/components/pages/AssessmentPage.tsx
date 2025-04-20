@@ -28,10 +28,10 @@ type EvaluationResult = {
 
 type AssessmentPageProps = {
   topics: { label: string, value: string }[];
-  assessmentType : string;
+  assessmentType: string;
 };
 
-const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics,assessmentType  }) => {
+const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType }) => {
   const [qaState, setQaState] = useState<QAState>({ status: 'idle' });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
@@ -53,6 +53,20 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics,assessmentType  
     return Math.round((totalScore / results.length) * 10) / 10;
   };
 
+  const resetAssessment = () => {
+    setQaState({ status: 'idle' });
+    setCurrentIndex(0);
+    setAnswers([]);
+    setResults([]);
+    setIsSubmitting(false);
+    setResultsModalOpen(false);
+    setUserEmail('');
+    setIsEmailSending(false);
+    setEmailSent(false);
+    setTopic('');
+    setDifficulty('medium');
+  };
+
   const loadQuestions = async () => {
     if (!topic) {
       toast({ title: "Please select a topic" });
@@ -61,7 +75,6 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics,assessmentType  
 
     setQaState({ status: 'loading' });
     try {
-        console.log(assessmentType);
       const questions = await ApiService.get('/interview/generate', {
         topic,
         count: 5,
@@ -72,10 +85,7 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics,assessmentType  
       setQaState({ status: 'ready', questions });
       setAnswers(Array(questions.length).fill(''));
     } catch (error) {
-      setQaState({
-        status: 'error',
-        error: 'Failed to load questions',
-      });
+      setQaState({ status: 'error', error: 'Failed to load questions' });
     }
   };
 
@@ -114,27 +124,23 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics,assessmentType  
       question: q,
       answer: answers[i] || '',
     }));
-    const results = await ApiService.post('/interview/evaluate?assessmentType=${assessmentType}', payload);
+    const results = await ApiService.post(`/interview/evaluate?assessmentType=${assessmentType}`, payload);
     setResults(results);
     setIsSubmitting(false);
   };
 
   return (
-    <div className="w-full px-4 sm:px-8 lg:px-16 py-8">
+    <div className="w-full px-4 sm:px-8 lg:px-16 py-10 text-gray-800">
       <Toaster />
 
-      <p className="text-gray-600 text-center mb-6">
-        Practice mock technical interviews, get AI-powered evaluation, and improve your answers!
-      </p>
-
-      {/* Choose topic & difficulty */}
+      {/* Intro Card */}
       {qaState.status === 'idle' && (
-        <Card className="w-full max-w-4xl mx-auto">
+        <Card className="w-full max-w-full mx-auto text-base">
           <CardHeader>
-            <CardTitle>Start a New Assessment</CardTitle>
-            <CardDescription>Choose a topic and difficulty level</CardDescription>
+            
+            <CardDescription className="text-base text-gray-600">Choose a topic and difficulty level to begin.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5">
             <Select value={topic} onValueChange={setTopic}>
               <SelectTrigger><SelectValue placeholder="Select a topic" /></SelectTrigger>
               <SelectContent>
@@ -154,35 +160,32 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics,assessmentType  
             </Select>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" onClick={loadQuestions}>Start Assessment</Button>
+            <Button className="w-full text-base py-6" onClick={loadQuestions}>Start Assessment</Button>
           </CardFooter>
         </Card>
       )}
 
-      {/* Loading */}
       {qaState.status === 'loading' && (
-        <div className="text-center text-gray-500 flex items-center justify-center mt-4">
+        <div className="text-center mt-6 text-lg flex items-center justify-center">
           <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading questions...
         </div>
       )}
 
-      {/* Error */}
       {qaState.status === 'error' && (
-        <Alert variant="destructive" className="mb-4">
+        <Alert variant="destructive" className="mb-6">
           <AlertDescription>{qaState.error}</AlertDescription>
         </Alert>
       )}
 
-      {/* Answering questions */}
       {qaState.status === 'ready' && qaState.questions && results.length === 0 && (
-        <Card className="w-full max-w-5xl mx-auto mt-6">
+        <Card className="w-full max-w-full mx-auto mt-8 text-base">
           <CardHeader>
-            <CardTitle>Question {currentIndex + 1} of {qaState.questions.length}</CardTitle>
-            <CardDescription>{qaState.questions[currentIndex]}</CardDescription>
+            <CardTitle className="text-xl font-semibold">Question {currentIndex + 1} of {qaState.questions.length}</CardTitle>
+            <CardDescription className="text-base">{qaState.questions[currentIndex]}</CardDescription>
           </CardHeader>
           <CardContent>
             <Textarea
-              className="min-h-[200px]"
+              className="min-h-[200px] text-base"
               placeholder="Type your answer here..."
               value={answers[currentIndex]}
               onChange={(e) => {
@@ -205,34 +208,36 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics,assessmentType  
         </Card>
       )}
 
-      {/* Results Modal */}
-      <Dialog open={isResultsModalOpen} onOpenChange={setResultsModalOpen}>
-        <DialogContent className="w-full max-w-4xl">
+      <Dialog open={isResultsModalOpen} onOpenChange={(open) => {
+        setResultsModalOpen(open);
+        if (!open) resetAssessment();
+      }}>
+        <DialogContent className="w-full max-w-full">
           {isSubmitting ? (
-            <div className="text-center py-4">
+            <div className="text-center py-6">
               <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4" />
-              <p className="text-lg font-semibold">Evaluating your answers...</p>
+              <p className="text-lg font-medium">Evaluating your answers...</p>
             </div>
           ) : (
             <>
               <DialogHeader>
-                <DialogTitle className="text-center">Your Evaluation Preview</DialogTitle>
-                <DialogDescription className="text-center">
-                  See how you performed on this assessment
+                <DialogTitle className="text-2xl text-center">Your Evaluation Preview</DialogTitle>
+                <DialogDescription className="text-center text-base">
+                  See how you performed on this assessment.
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="mb-4 mt-4 space-y-4">
+              <div className="mb-6 mt-6 space-y-5 text-base">
                 {results.slice(0, 2).map((result, idx) => (
                   <Card key={idx} className="bg-gray-50 w-full">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-semibold">Q: {qaState.questions?.[idx]}</CardTitle>
+                      <CardTitle className="text-base font-medium">Q: {qaState.questions?.[idx]}</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-2 pt-0 text-sm">
-                      <div><strong>Your Answer:</strong> {answers[idx]}</div>
-                      <div className="text-blue-600"><strong>Score:</strong> {result.score}</div>
-                      <div className="text-gray-800"><strong>Feedback:</strong> {result.feedback}</div>
-                      <div className="text-green-600"><strong>Correct Answer:</strong> {result.correctAnswer}</div>
+                    <CardContent className="space-y-2 pt-0 text-sm text-gray-700">
+                      <p><strong>Your Answer:</strong> {answers[idx]}</p>
+                      <p className="text-blue-600"><strong>Score:</strong> {result.score}</p>
+                      <p><strong>Feedback:</strong> {result.feedback}</p>
+                      <p className="text-green-600"><strong>Correct Answer:</strong> {result.correctAnswer}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -242,11 +247,11 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics,assessmentType  
                 Want full feedback? Enter your email:
               </p>
 
-              <div className="mt-4">
+              <div className="space-y-3">
                 {emailSent ? (
-                  <p className="text-green-600">Results sent!</p>
+                  <p className="text-green-600 text-center">Results sent!</p>
                 ) : (
-                  <div className="space-y-2">
+                  <>
                     <Input
                       type="email"
                       value={userEmail}
@@ -257,11 +262,11 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics,assessmentType  
                     <Button
                       onClick={handleSendResultsEmail}
                       disabled={isEmailSending || !isEmailValid}
-                      className="w-full"
+                      className="w-full text-base"
                     >
                       {isEmailSending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...</> : 'Send Full Evaluation'}
                     </Button>
-                  </div>
+                  </>
                 )}
               </div>
             </>

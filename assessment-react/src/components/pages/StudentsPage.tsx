@@ -59,8 +59,7 @@ export default function StudentsPage() {
       </section>
 
       {/* Assessment Section */}
-      <section className="bg-white p-8 rounded-lg shadow-md mb-12">
-        <h2 className="text-2xl font-bold text-center mb-6 text-blue-800">Select Your Topic and Start Learning</h2>
+      <section className="bg-white p-8 rounded-lg shadow-md">        
         <p className="text-lg text-center text-gray-600 mb-4">
           Choose from the list of subjects and year levels below. Each assessment is tailored to your skill level and will help you improve in areas that matter most.
         </p>
