@@ -20,6 +20,6 @@ export const router = createBrowserRouter(
     }
   ],
   {
-    basename: import.meta.env.BASE_URL // Critical for subfolder routing
+    basename: import.meta.env.VITE_BASE_URL || '/AssessmentNinja', 
   }
 );
