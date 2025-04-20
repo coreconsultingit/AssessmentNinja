@@ -5,9 +5,9 @@ import { FaUserNinja } from 'react-icons/fa'; // Font Awesome Ninja icon
 const Header: React.FC<{ className?: string }> = ({ className }) => {
   const location = useLocation();
   const navItems = [
-    { path: 'Home', label: 'Home' },
-    { path: 'Student', label: 'Student' },
-    { path: 'contactus', label: 'Contact Us' }
+    { path: 'home', label: 'Home' },
+    { path: 'student', label: 'Student' },
+    { path: 'contact-us', label: 'Contact Us' },
   ];
 
   return (
@@ -24,7 +24,7 @@ const Header: React.FC<{ className?: string }> = ({ className }) => {
         <nav>
           <ul className="flex space-x-8">
             {navItems.map(({ path, label }) => {
-              const isActive = location.pathname.endsWith(path);
+              const isActive = location.pathname.toLowerCase().includes(path.toLowerCase());
               return (
                 <li key={path} className={`relative ${isActive ? 'text-yellow-400' : 'text-white'}`}>
                   <Link

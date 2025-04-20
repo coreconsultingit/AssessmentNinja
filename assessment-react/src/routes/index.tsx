@@ -11,28 +11,12 @@ export const router = createBrowserRouter(
       element: <Layout />,
       errorElement: <ErrorPage />,
       children: [
-        { 
-          path: 'Home', // Matches /DotNetInterview/Home
-          element: <HomePage /> 
-        },
-        { 
-          index: true, // Redirect root to Home
-          element: <Navigate to="Home" replace /> 
-        }
-        ,
-        { 
-          path: 'Student', // Matches /DotNetInterview/Home
-          element: <StudentsPage /> 
-        },
-        { 
-          path: 'ContactUs', // Matches /DotNetInterview/Home
-          element: <ContactUs /> 
-        },
-        {
-          path: '*',
-          element: <ErrorPage />
-        }
-      ],
+        { path: '', element: <Navigate to="home" replace /> }, // redirect root to /home
+        { path: 'home', element: <HomePage /> },
+        { path: 'student', element: <StudentsPage /> },
+        { path: 'contact-us', element: <ContactUs /> },
+        { path: '*', element: <ErrorPage /> },
+      ]
     }
   ],
   {
