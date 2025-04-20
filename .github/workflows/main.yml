@@ -15,16 +15,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+
       - run: npm install
-        working-directory: ./assessment-react
+
       - run: NODE_ENV=production npm run build
-        working-directory: ./assessment-react
+
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: ./assessment-react/dist
+          path: ./dist
 
   deploy:
     needs: build
