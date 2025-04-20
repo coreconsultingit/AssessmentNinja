@@ -23,7 +23,7 @@ const ContactUs: React.FC = () => {
 
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
-  const [industry, setIndustry] = useState('');
+  const [, setIndustry] = useState('');
   const [content, setContent] = useState('');
   const [errors, setErrors] = useState({
     email: '',
