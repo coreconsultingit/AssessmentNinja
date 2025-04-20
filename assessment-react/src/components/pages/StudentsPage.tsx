@@ -64,7 +64,7 @@ export default function StudentsPage() {
         <p className="text-lg text-center text-gray-600 mb-4">
           Choose from the list of subjects and year levels below. Each assessment is tailored to your skill level and will help you improve in areas that matter most.
         </p>
-        <AssessmentPage topics={topics} />
+        <AssessmentPage topics={topics} assessmentType="student"/>
       </section>
 
       {/* How It Works Section */}

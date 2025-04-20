@@ -28,9 +28,10 @@ type EvaluationResult = {
 
 type AssessmentPageProps = {
   topics: { label: string, value: string }[];
+  assessmentType : string;
 };
 
-const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics }) => {
+const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics,assessmentType  }) => {
   const [qaState, setQaState] = useState<QAState>({ status: 'idle' });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
@@ -60,10 +61,12 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics }) => {
 
     setQaState({ status: 'loading' });
     try {
+        console.log(assessmentType);
       const questions = await ApiService.get('/interview/generate', {
         topic,
         count: 5,
         difficulty,
+        assessmentType
       });
 
       setQaState({ status: 'ready', questions });
@@ -111,7 +114,7 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics }) => {
       question: q,
       answer: answers[i] || '',
     }));
-    const results = await ApiService.post('/interview/evaluate', payload);
+    const results = await ApiService.post('/interview/evaluate?assessmentType=${assessmentType}', payload);
     setResults(results);
     setIsSubmitting(false);
   };

@@ -65,7 +65,7 @@ export default function HomePage() {
           transition={{ duration: 0.8 }}
           className="py-16 px-4 bg-gray-50"
         >
-          <AssessmentPage topics={topics} />
+          <AssessmentPage topics={topics} assessmentType="interview"/>
         </motion.section>
       )}
 
