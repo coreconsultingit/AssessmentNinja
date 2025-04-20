@@ -20,7 +20,7 @@ jobs:
           node-version: '20'
       - run: npm install
         working-directory: ./assessment-react
-      - run: npm run build
+      - run: NODE_ENV=production npm run build
         working-directory: ./assessment-react
       - uses: actions/upload-pages-artifact@v3
         with:

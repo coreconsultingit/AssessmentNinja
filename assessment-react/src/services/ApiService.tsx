@@ -4,8 +4,7 @@ import axios from 'axios';
 
 class ApiService {
   // Set base URL for all axios calls
-  static baseURL = 'https://localhost:7018/'; // Update this with your API base URL
-//https://smspapi-cxhzera4excgckfw.canadacentral-01.azurewebsites.net/
+  static baseURL = import.meta.env.VITE_API_BASE_URL;
   // Axios instance for custom configuration (like adding headers, timeouts, etc.)
   static axiosInstance = axios.create({
     baseURL: ApiService.baseURL,
