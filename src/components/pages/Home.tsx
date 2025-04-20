@@ -6,9 +6,13 @@ import { Button } from "@/components/ui/button";
 import { LiveExaminerFlowSection } from "./LiveExaminerFlowSection";
 
 const topics = [
-  { label: "Python", value: "python" },
-  { label: "Java", value: "java" },
+  { label: "Angular", value: "angular" },
+  { label: "Aws", value: "aws" },
+  { label: "Azure", value: "azure" },
   { label: "C#", value: "csharp" },
+  { label: "Java", value: "java" },
+  { label: "Python", value: "python" },
+  { label: "React", value: "ReactJs" }, 
   { label: "SQL Server", value: "sqlserver" },
 ];
 
