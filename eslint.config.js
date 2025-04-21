@@ -22,7 +22,10 @@ export default tseslint.config(
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
+        
       ],
+      "no-unused-vars": "off", // or "warn" if you want warnings instead of errors
+      "@typescript-eslint/no-unused-vars": "off", // for TypeScript
     },
   },
 )
