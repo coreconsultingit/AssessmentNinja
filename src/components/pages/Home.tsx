@@ -1,25 +1,110 @@
-// src/components/pages/Home.tsx
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import AssessmentPage from "./AssessmentPage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LiveExaminerFlowSection } from "./LiveExaminerFlowSection";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { ChevronRight } from "lucide-react";
 
 const topics = [
   { label: "Angular", value: "angular" },
   { label: "AWS", value: "aws" },
   { label: "Azure", value: "azure" },
   { label: "C#", value: "csharp" },
+  { label: "Django", value: "django" },
+  { label: "Docker", value: "docker" },
+  { label: "GCP", value: "gcp" },
   { label: "Java", value: "java" },
+  { label: "Node.Js", value: "node.js" },
   { label: "Python", value: "python" },
   { label: "React", value: "ReactJs" },
+  { label: "Spring", value: "spring" },
+  { label: "TypeScript", value: "typeScript" },
   { label: "SQL Server", value: "sqlserver" },
+  
 ];
 
 export default function HomePage() {
+  const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
+  const [popularTechIndex, setPopularTechIndex] = useState(0);
+
+  const popularTechGroups = [
+    ['React', 'Node.js', 'TypeScript', 'Next.js'],
+    ['Python', 'Django', 'Flask', 'FastAPI'],
+    ['AWS', 'Azure', 'GCP', 'Docker'],
+    ['C#', '.NET', 'Java', 'Spring']
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPopularTechIndex((prev) => (prev + 1) % popularTechGroups.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="min-h-screen w-full bg-white text-gray-800">
+      {/* How It Works Dialog */}
+      <Dialog open={isHowItWorksOpen} onOpenChange={setIsHowItWorksOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">How Assessment Ninja Works</DialogTitle>
+            <DialogDescription>
+              Get the most out of our platform with these simple steps
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {[
+              {
+                step: "1",
+                title: "Select Your Technology",
+                description: "Choose from our wide range of supported technologies and frameworks",
+                icon: "💻"
+              },
+              {
+                step: "2",
+                title: "Set Difficulty Level",
+                description: "Pick between Easy, Medium, or Hard based on your skill level",
+                icon: "📊"
+              },
+              {
+                step: "3",
+                title: "Answer Questions",
+                description: "Respond to AI-generated questions in your own words",
+                icon: "✍️"
+              },
+              {
+                step: "4",
+                title: "Get Instant Feedback",
+                description: "Receive detailed evaluation with scores and correct answers",
+                icon: "🚀"
+              }
+            ].map((item) => (
+              <div key={item.step} className="flex gap-4">
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-bold">
+                    {item.step}
+                  </div>
+                  {item.step !== "4" && (
+                    <div className="w-0.5 h-full bg-blue-100 my-1"></div>
+                  )}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{item.icon}</span>
+                    <h3 className="text-lg font-semibold">{item.title}</h3>
+                  </div>
+                  <p className="text-gray-600 mt-1">{item.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-100/40 to-transparent"></div>
@@ -55,27 +140,32 @@ export default function HomePage() {
               onClick={() => document.getElementById('assessment')?.scrollIntoView({ behavior: 'smooth' })}
             >
               Start Free Assessment
-            </Button>      {/*
+            </Button>
             <Button
               variant="outline"
               size="lg"
               className="px-8 py-6 text-lg border-blue-600 text-blue-600 hover:bg-blue-50"
+              onClick={() => setIsHowItWorksOpen(true)}
             >
               How It Works
-            </Button>*/}
+            </Button>
           </motion.div>
           
-          {/*<div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-md mx-auto">
-            {['React', 'Python', 'AWS', 'C#'].map((tech) => (
+          <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-md mx-auto">
+            {popularTechGroups[popularTechIndex].map((tech) => (
               <motion.div
                 key={tech}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
                 whileHover={{ y: -5 }}
-                className="bg-white p-3 rounded-lg shadow-sm border border-blue-100 text-sm font-medium"
+                className="bg-white p-3 rounded-lg shadow-sm border border-blue-100 text-sm font-medium flex items-center justify-center gap-2"
               >
+                <ChevronRight className="h-4 w-4 text-blue-500" />
                 {tech}
               </motion.div>
             ))}
-          </div>*/}
+          </div>
         </div>
       </section>
 

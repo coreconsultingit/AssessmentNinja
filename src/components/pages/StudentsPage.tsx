@@ -16,6 +16,7 @@ const topics = [
   ...generateYearTopics("English", years),
   ...generateYearTopics("Geography", years),
   ...generateYearTopics("History", years),
+  ...generateYearTopics("General Knowledge", years),
 ];
 
 export default function StudentsPage() {
