@@ -1,4 +1,3 @@
-// components/AssessmentPage.tsx
 import React, { useState } from 'react';
 import ApiService from '../../services/ApiService';
 import { motion } from "framer-motion";
@@ -81,17 +80,17 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
     try {
       const questions = await ApiService.get('/interview/generate', {
         topic,
-        count: 5, // Ensure we always get 5 questions
+        count: 5,
         difficulty,
         assessmentType
       });
 
-      if (questions.length !== 5) {
+      if (!questions || questions.length !== 5) {
         throw new Error('Did not receive 5 questions');
       }
 
       setQaState({ status: 'ready', questions });
-      setAnswers(Array(5).fill('')); // Initialize with 5 empty answers
+      setAnswers(Array(5).fill(''));
     } catch (error) {
       setQaState({ 
         status: 'error', 
@@ -161,6 +160,10 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
         payload
       );
       
+      if (!evaluationResults || evaluationResults.length !== 5) {
+        throw new Error('Did not receive 5 evaluations');
+      }
+
       setResults(evaluationResults);
     } catch (error) {
       toast({
@@ -168,6 +171,7 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
         description: "Failed to evaluate answers. Please try again.",
         variant: "destructive"
       });
+      setResultsModalOpen(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -178,93 +182,68 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
       <Toaster />
 
       {/* Intro Card */}
-      {qaState.status === 'ready' && qaState.questions && results.length === 0 && (
+      {qaState.status === 'idle' && (
         <motion.div
-          key="questions"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="space-y-6"
         >
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-blue-900">
-              Question {currentIndex + 1} of {qaState.questions.length}
-            </h3>
-            <div className="text-sm text-gray-500">
-              {answers[currentIndex]?.length > 0 ? `${answers[currentIndex].length} characters` : ''}
-            </div>
-          </div>
-
-          {/* Current Question Card */}
-          <Card className="border border-blue-100">
+          <Card className="border border-blue-100 shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg">
-                {qaState.questions[currentIndex]}
+              <CardTitle className="text-xl md:text-2xl text-blue-900">
+                {assessmentType === 'interview' 
+                  ? "Technical Skills Assessment" 
+                  : "Student Learning Assessment"}
               </CardTitle>
+              <CardDescription>
+                {assessmentType === 'interview'
+                  ? "Select a technology and difficulty level to begin your assessment"
+                  : "Select your subject and year level to begin"}
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Textarea
-                className="min-h-[200px] text-base"
-                placeholder="Type your answer here..."
-                value={answers[currentIndex] || ''}
-                onChange={(e) => {
-                  const updated = [...answers];
-                  updated[currentIndex] = e.target.value;
-                  setAnswers(updated);
-                }}
-              />
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {assessmentType === 'interview' ? "Technology" : "Subject"}
+                  </label>
+                  <Select value={topic} onValueChange={setTopic}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={`Select ${assessmentType === 'interview' ? 'technology' : 'subject'}`} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {topics.map(({ label, value }) => (
+                        <SelectItem key={value} value={value}>{label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+                  <Select value={difficulty} onValueChange={setDifficulty}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select difficulty" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="easy">Easy</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="hard">Hard</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button
-                variant="outline"
-                onClick={() => setCurrentIndex(i => Math.max(i - 1, 0))}
-                disabled={currentIndex === 0}
+            <CardFooter>
+              <Button 
+                onClick={loadQuestions}
+                className="w-full py-6"
+                disabled={!topic}
               >
-                Previous
+                Start Assessment
               </Button>
-              
-              {currentIndex < qaState.questions.length - 1 ? (
-                <Button 
-                  onClick={() => setCurrentIndex(i => i + 1)}
-                  disabled={!answers[currentIndex]?.trim()}
-                >
-                  Next Question
-                </Button>
-              ) : (
-                <Button 
-                  onClick={handleSubmitAll}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Evaluating...
-                    </>
-                  ) : (
-                    'Submit All Answers'
-                  )}
-                </Button>
-              )}
             </CardFooter>
           </Card>
-
-          {/* Question Progress Dots */}
-          <div className="flex justify-center gap-2">
-            {qaState.questions.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-3 h-3 rounded-full transition-colors ${
-                  currentIndex === index 
-                    ? 'bg-blue-600' 
-                    : answers[index] 
-                      ? 'bg-green-500' 
-                      : 'bg-gray-300'
-                }`}
-                aria-label={`Go to question ${index + 1}`}
-              />
-            ))}
-          </div>
         </motion.div>
       )}
 
@@ -299,7 +278,7 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
         </motion.div>
       )}
 
-      {/* Question Display */}
+      {/* Question Display - Shows ALL 5 questions */}
       {qaState.status === 'ready' && qaState.questions && results.length === 0 && (
         <motion.div
           key="questions"
@@ -388,7 +367,7 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
         </motion.div>
       )}
 
-      {/* Results Modal */}
+      {/* Results Modal - Shows only 2 evaluations */}
       <Dialog open={isResultsModalOpen} onOpenChange={setResultsModalOpen}>
         <DialogContent className="max-w-2xl">
           {isSubmitting ? (
@@ -408,7 +387,7 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
               </DialogHeader>
 
               <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
-                {/* Only show first 2 evaluations */}
+                {/* Show first 2 evaluations */}
                 {results.slice(0, 2).map((result, idx) => (
                   <motion.div
                     key={idx}
@@ -442,6 +421,10 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
                           <span className="font-medium">Feedback:</span>
                           <p className="text-gray-700 mt-1">{result.feedback}</p>
                         </div>
+                        <div>
+                          <span className="font-medium">Correct Answer:</span>
+                          <p className="text-gray-700 mt-1">{result.correctAnswer}</p>
+                        </div>
                       </CardContent>
                     </Card>
                   </motion.div>
@@ -462,7 +445,6 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
                 )}
               </div>
 
-              {/* Email collection section */}
               {!emailSent ? (
                 <div className="space-y-4 pt-4">
                   <div>
