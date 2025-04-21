@@ -47,9 +47,25 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail);
 
   const calculateOverallScore = () => {
-    if (!results.length) return 0;
+    if (!results.length) return { percentage: 0, total: 0, maxPossible: 0 };
+    
     const totalScore = results.reduce((sum, result) => sum + result.score, 0);
-    return Math.round((totalScore / results.length) * 10) / 10;
+    const maxPossible = results.length * 5; // 5 points per question
+    
+    return {
+      percentage: Math.round((totalScore / maxPossible) * 100),
+      total: totalScore,
+      maxPossible: maxPossible
+    };
+  };
+  
+  // Update your display to show proper scoring:
+  const scoreData = calculateOverallScore();
+  const getPerformanceLabel = (percentage: number) => {
+    if (percentage >= 80) return "Excellent";
+    if (percentage >= 60) return "Good";
+    if (percentage >= 40) return "Fair";
+    return "Needs Improvement";
   };
 
   const resetAssessment = () => {
@@ -65,7 +81,8 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
     setTopic('');
     setDifficulty('medium');
   };
-
+  
+  const performanceLabel = getPerformanceLabel(scoreData.percentage);
   const loadQuestions = async () => {
     if (!topic) {
       toast({ 
@@ -112,12 +129,12 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
         feedback: results[idx]?.feedback || '',
         correctAnswer: results[idx]?.correctAnswer || ''
       }));
-
+      
       await ApiService.post('/interview/send-email', {
         email: userEmail,
         subject: "Your Complete Assessment Results",
         content: JSON.stringify(formattedResults),
-        overallScore: calculateOverallScore()
+        overallScore: scoreData.percentage
       });
 
       setEmailSent(true);
@@ -382,7 +399,9 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
                   Assessment Preview
                 </DialogTitle>
                 <DialogDescription className="text-center">
-                  Your overall score: {calculateOverallScore()}/5
+                <p className="text-center text-lg font-semibold">
+    Overall Score: {scoreData.total}/{scoreData.maxPossible} ({scoreData.percentage}% - {performanceLabel})
+  </p>
                 </DialogDescription>
               </DialogHeader>
 
