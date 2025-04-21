@@ -141,7 +141,7 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Mock evaluation results
-      const mockResults = qaState.questions!.map((question, i) => ({
+      const mockResults = qaState.questions!.map((_, i) => ({
         score: Math.floor(Math.random() * 3) + 2, // Random score 2-5
         feedback: answers[i].length > 30 
           ? "Good answer with relevant details" 
