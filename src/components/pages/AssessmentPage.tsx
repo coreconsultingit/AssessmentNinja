@@ -1,4 +1,8 @@
+// components/AssessmentPage.tsx
 import React, { useState } from 'react';
+import ApiService from '../../services/ApiService';
+import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
@@ -9,8 +13,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
 
 type QAState = {
   status: 'idle' | 'loading' | 'ready' | 'error';
@@ -77,20 +79,15 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
 
     setQaState({ status: 'loading' });
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock questions based on topic and difficulty
-      const mockQuestions = [
-        `Explain the main concepts of ${topic} at a ${difficulty} level`,
-        `What are the key differences between ${topic} and similar technologies?`,
-        `Describe a real-world application of ${topic}`,
-        `What are the advantages of using ${topic}?`,
-        `How would you solve a common problem in ${topic}?`
-      ];
-      
-      setQaState({ status: 'ready', questions: mockQuestions });
-      setAnswers(Array(mockQuestions.length).fill(''));
+      const questions = await ApiService.get('/interview/generate', {
+        topic,
+        count: 5,
+        difficulty,
+        assessmentType
+      });
+
+      setQaState({ status: 'ready', questions });
+      setAnswers(Array(questions.length).fill(''));
     } catch (error) {
       setQaState({ 
         status: 'error', 
@@ -105,8 +102,21 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
     
     setIsEmailSending(true);
     try {
-      // Simulate email sending
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const formattedResults = qaState.questions!.map((q, idx) => ({
+        question: q,
+        answer: answers[idx] || '',
+        score: results[idx]?.score || 0,
+        feedback: results[idx]?.feedback || '',
+        correctAnswer: results[idx]?.correctAnswer || ''
+      }));
+
+      await ApiService.post('/interview/send-email', {
+        email: userEmail,
+        subject: "Your Complete Assessment Results",
+        content: JSON.stringify(formattedResults),
+        overallScore: calculateOverallScore()
+      });
+
       setEmailSent(true);
       toast({ 
         title: "Success!",
@@ -137,19 +147,17 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
     setResultsModalOpen(true);
     
     try {
-      // Simulate API evaluation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock evaluation results
-      const mockResults = qaState.questions!.map((_, i) => ({
-        score: Math.floor(Math.random() * 3) + 2, // Random score 2-5
-        feedback: answers[i].length > 30 
-          ? "Good answer with relevant details" 
-          : "Your answer could use more elaboration",
-        correctAnswer: `A comprehensive answer would include key concepts from ${topic} and specific examples of its application.`
+      const payload = qaState.questions!.map((q, i) => ({
+        question: q,
+        answer: answers[i] || '',
       }));
       
-      setResults(mockResults);
+      const evaluationResults = await ApiService.post(
+        `/interview/evaluate?assessmentType=${assessmentType}`, 
+        payload
+      );
+      
+      setResults(evaluationResults);
     } catch (error) {
       toast({
         title: "Evaluation Error",
@@ -353,154 +361,162 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
 
       {/* Results Modal */}
       <Dialog open={isResultsModalOpen} onOpenChange={setResultsModalOpen}>
-  <DialogContent className="max-w-2xl">
-    {isSubmitting ? (
-      <div className="text-center py-12">
-        <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-blue-600" />
-        <p className="text-lg font-medium">Evaluating your answers...</p>
-      </div>
-    ) : (
-      <>
-        <DialogHeader>
-          <DialogTitle className="text-2xl text-center">
-            Assessment Preview
-          </DialogTitle>
-          <DialogDescription className="text-center">
-            Your overall score: {calculateOverallScore()}/5
-          </DialogDescription>
-        </DialogHeader>
+        <DialogContent className="max-w-2xl">
+          {isSubmitting ? (
+            <div className="text-center py-12">
+              <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-blue-600" />
+              <p className="text-lg font-medium">Evaluating your answers...</p>
+            </div>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl text-center">
+                  Assessment Preview
+                </DialogTitle>
+                <DialogDescription className="text-center">
+                  Your overall score: {calculateOverallScore()}/5
+                </DialogDescription>
+              </DialogHeader>
 
-        <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
-          {results.slice(0, 2).map((result, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-            >
-              <Card className="border border-blue-100">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base font-medium">
-                    Q{idx + 1}: {qaState.questions?.[idx]}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">Score:</span>
-                    <Badge 
-                      variant={
-                        result.score >= 4 ? 'default' : 
-                        result.score >= 2 ? 'secondary' : 'destructive'
-                      }
-                    >
-                      {result.score}/5
-                    </Badge>
-                  </div>
+              <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
+                {results.slice(0, 2).map((result, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                  >
+                    <Card className="border border-blue-100">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-base font-medium">
+                          Q{idx + 1}: {qaState.questions?.[idx]}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3 text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">Score:</span>
+                          <Badge 
+                            variant={
+                              result.score >= 4 ? 'default' : 
+                              result.score >= 2 ? 'secondary' : 'destructive'
+                            }
+                          >
+                            {result.score}/5
+                          </Badge>
+                        </div>
+                        <div>
+                          <span className="font-medium">Your Answer:</span>
+                          <p className="text-gray-700 mt-1">{answers[idx]}</p>
+                        </div>
+                        <div>
+                          <span className="font-medium">Feedback:</span>
+                          <p className="text-gray-700 mt-1">{result.feedback}</p>
+                        </div>
+                        <div>
+                          <span className="font-medium">Correct Answer:</span>
+                          <p className="text-gray-700 mt-1">{result.correctAnswer}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+
+                {results.length > 2 && (
+                  <Card className="border border-blue-200 bg-blue-50/50">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-blue-800 font-medium">
+                        {results.length - 2} more questions evaluated
+                      </p>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Enter your email to receive the complete report
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+
+              {!emailSent ? (
+                <div className="space-y-4 pt-4">
                   <div>
-                    <span className="font-medium">Feedback:</span>
-                    <p className="text-gray-700 mt-1">{result.feedback}</p>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Get full results via email
+                    </label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="email"
+                        value={userEmail}
+                        onChange={(e) => setUserEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        className={`flex-1 ${userEmail && !isEmailValid ? 'border-red-500' : ''}`}
+                      />
+                      <Button
+                        onClick={handleSendResultsEmail}
+                        disabled={isEmailSending || !isEmailValid}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        {isEmailSending ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Sending
+                          </>
+                        ) : (
+                          'Send Report'
+                        )}
+                      </Button>
+                    </div>
+                    {userEmail && !isEmailValid && (
+                      <p className="text-sm text-red-500 mt-1">Please enter a valid email</p>
+                    )}
                   </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
 
-          {results.length > 2 && (
-            <Card className="border border-blue-200 bg-blue-50/50">
-              <CardContent className="p-4 text-center">
-                <p className="text-blue-800 font-medium">
-                  {results.length - 2} more questions evaluated
-                </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  Enter your email to receive the complete report
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-yellow-700">
+                          Your full assessment report includes detailed feedback and model answers for all questions.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
 
-        {!emailSent ? (
-          <div className="space-y-4 pt-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Get full results via email
-              </label>
-              <div className="flex gap-2">
-                <Input
-                  type="email"
-                  value={userEmail}
-                  onChange={(e) => setUserEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  className={`flex-1 ${userEmail && !isEmailValid ? 'border-red-500' : ''}`}
-                />
-                <Button
-                  onClick={handleSendResultsEmail}
-                  disabled={isEmailSending || !isEmailValid}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  {isEmailSending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Sending
-                    </>
-                  ) : (
-                    'Send Report'
-                  )}
-                </Button>
-              </div>
-              {userEmail && !isEmailValid && (
-                <p className="text-sm text-red-500 mt-1">Please enter a valid email</p>
+                  <Button
+                    variant="outline"
+                    onClick={resetAssessment}
+                    className="w-full mt-2"
+                  >
+                    Maybe Later
+                  </Button>
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-4">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-green-700">
+                          Your full report has been sent to {userEmail}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <Button onClick={resetAssessment} className="w-full">
+                    Start New Assessment
+                  </Button>
+                </div>
               )}
-            </div>
-
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-yellow-700">
-                    Your full assessment report includes detailed feedback and model answers for all questions.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <Button
-              variant="outline"
-              onClick={resetAssessment}
-              className="w-full mt-2"
-            >
-              Maybe Later
-            </Button>
-          </div>
-        ) : (
-          <div className="text-center py-4">
-            <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-green-700">
-                    Your full report has been sent to {userEmail}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <Button onClick={resetAssessment} className="w-full">
-              Start New Assessment
-            </Button>
-          </div>
-        )}
-      </>
-    )}
-  </DialogContent>
-</Dialog>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
