@@ -109,6 +109,7 @@ const AssessmentPage: React.FC<AssessmentPageProps> = ({ topics, assessmentType 
       });
 
       setEmailSent(true);
+      setResultsModalOpen(false); 
       toast({ title: "Results sent successfully!" });
     } catch (error) {
       toast({ title: "Failed to send email", variant: "destructive" });
