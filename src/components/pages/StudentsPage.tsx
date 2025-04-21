@@ -1,87 +1,130 @@
-import { FaLightbulb, FaBrain, FaClipboardList } from 'react-icons/fa'; // Import icons for a better visual experience
+import { FaLightbulb, FaBrain, FaClipboardList } from 'react-icons/fa';
 import AssessmentPage from './AssessmentPage';
+import { motion } from 'framer-motion';
 
-// Function to dynamically generate topics for each subject and year
 const generateYearTopics = (subject: string, years: number[]) => {
-  return years.map((year) => {
-    return { 
-      label: `${subject} (Year ${year})`, 
-      value: `${subject} Year-${year}`
-    };
-  });
+  return years.map((year) => ({
+    label: `${subject} (Year ${year})`, 
+    value: `${subject} Year-${year}`
+  }));
 };
 
-// Predefined years for each subject
 const years = [3, 4, 5, 6, 7, 8, 9, 10];
-
-// Generating topics for each subject
-const scienceTopics = generateYearTopics("Science", years);
-const mathTopics = generateYearTopics("Math", years);
-const englishTopics = generateYearTopics("English", years);
-const geographyTopics = generateYearTopics("Geography", years);
-const historyTopics = generateYearTopics("History", years);
-
-// Combine all subject topics into a single array
 const topics = [
-  ...scienceTopics,
-  ...mathTopics,
-  ...englishTopics,
-  ...geographyTopics,
-  ...historyTopics,
+  ...generateYearTopics("Science", years),
+  ...generateYearTopics("Math", years),
+  ...generateYearTopics("English", years),
+  ...generateYearTopics("Geography", years),
+  ...generateYearTopics("History", years),
 ];
 
 export default function StudentsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-100 via-white to-blue-50 py-16 px-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 to-white py-8 px-6">
       {/* Introduction Section */}
-      <section className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-blue-800 mb-4">Welcome to Your Personalized Learning Dashboard</h1>
-        <p className="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto mb-6">
-          Ready to take on your next assessment? Choose a subject and year level to get started! Our platform will help you improve with AI-powered assessments tailored to your learning level.
-        </p>
-        <div className="flex justify-center gap-8 mt-8">
-          <div className="flex flex-col items-center bg-white shadow-lg rounded-lg p-6 w-64">
-            <FaLightbulb className="text-4xl text-yellow-500 mb-4" />
-            <h3 className="font-semibold text-xl text-blue-600 mb-2">Engage Your Brain</h3>
-            <p className="text-gray-700 text-center">Select a subject and year level that suits you best. Dive into assessments and watch your skills grow!</p>
-          </div>
-          <div className="flex flex-col items-center bg-white shadow-lg rounded-lg p-6 w-64">
-            <FaBrain className="text-4xl text-green-500 mb-4" />
-            <h3 className="font-semibold text-xl text-blue-600 mb-2">Boost Your Knowledge</h3>
-            <p className="text-gray-700 text-center">AI-generated questions provide real-time feedback to help you improve, track your progress, and become more confident in your studies.</p>
-          </div>
-          <div className="flex flex-col items-center bg-white shadow-lg rounded-lg p-6 w-64">
-            <FaClipboardList className="text-4xl text-purple-500 mb-4" />
-            <h3 className="font-semibold text-xl text-blue-600 mb-2">Stay Organized</h3>
-            <p className="text-gray-700 text-center">Keep track of your progress, see areas for improvement, and get back to learning with personalized recommendations.</p>
-          </div>
-        </div>
+      <section className="text-center mb-12 max-w-4xl mx-auto">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-3xl md:text-4xl font-bold text-blue-900 mb-6"
+        >
+          Personalized Learning for <span className="text-blue-600">Students</span>
+        </motion.h1>
+        
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-lg text-gray-700 mb-8"
+        >
+          AI-powered assessments tailored to your year level and learning needs.
+        </motion.p>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+        >
+          {[
+            {
+              icon: <FaLightbulb className="text-3xl text-yellow-500 mb-4" />,
+              title: "Engage Your Brain",
+              description: "Select your subject and year level for personalized assessments"
+            },
+            {
+              icon: <FaBrain className="text-3xl text-green-500 mb-4" />,
+              title: "Boost Your Knowledge",
+              description: "Get real-time feedback to improve your understanding"
+            },
+            {
+              icon: <FaClipboardList className="text-3xl text-purple-500 mb-4" />,
+              title: "Track Progress",
+              description: "Monitor your improvement over time"
+            }
+          ].map((feature, index) => (
+            <motion.div
+              key={index}
+              whileHover={{ y: -5 }}
+              className="bg-white p-6 rounded-xl shadow-sm border border-blue-100 text-center"
+            >
+              {feature.icon}
+              <h3 className="text-xl font-semibold mb-2 text-blue-800">{feature.title}</h3>
+              <p className="text-gray-700">{feature.description}</p>
+            </motion.div>
+          ))}
+        </motion.div>
       </section>
 
       {/* Assessment Section */}
-      <section className="bg-white p-8 rounded-lg shadow-md">        
-        <p className="text-lg text-center text-gray-600 mb-4">
-          Choose from the list of subjects and year levels below. Each assessment is tailored to your skill level and will help you improve in areas that matter most.
-        </p>
+      <section className="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-blue-100 max-w-4xl mx-auto mb-12">
         <AssessmentPage topics={topics} assessmentType="student"/>
       </section>
 
       {/* How It Works Section */}
-      <section className="bg-blue-50 p-8 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center mb-6 text-blue-800">How Does It Work?</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="flex flex-col items-center bg-white shadow-lg rounded-lg p-6">
-            <h3 className="font-semibold text-xl text-blue-600 mb-2">1. Choose Your Subject</h3>
-            <p className="text-gray-700 text-center">Select your subject (Math, Science, History, etc.) and pick the year that matches your current learning level.</p>
-          </div>
-          <div className="flex flex-col items-center bg-white shadow-lg rounded-lg p-6">
-            <h3 className="font-semibold text-xl text-blue-600 mb-2">2. Take the Assessment</h3>
-            <p className="text-gray-700 text-center">AI-generated questions are tailored to your level. Answer questions in real-time and get instant feedback on your progress.</p>
-          </div>
-          <div className="flex flex-col items-center bg-white shadow-lg rounded-lg p-6">
-            <h3 className="font-semibold text-xl text-blue-600 mb-2">3. Review & Improve</h3>
-            <p className="text-gray-700 text-center">Review your answers, track areas of improvement, and continue practicing to boost your knowledge and confidence.</p>
-          </div>
+      <section className="bg-blue-50/50 p-8 rounded-xl border border-blue-100 max-w-4xl mx-auto">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-2xl font-bold text-center mb-8 text-blue-900"
+        >
+          How It Works
+        </motion.h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            {
+              step: "1",
+              title: "Choose Your Subject",
+              description: "Select your subject and year level"
+            },
+            {
+              step: "2",
+              title: "Take the Assessment",
+              description: "Answer AI-generated questions"
+            },
+            {
+              step: "3",
+              title: "Review & Improve",
+              description: "Get feedback and track progress"
+            }
+          ].map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              className="bg-white p-6 rounded-lg shadow-sm border border-blue-100"
+            >
+              <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-bold mb-4">
+                {item.step}
+              </div>
+              <h3 className="text-lg font-semibold mb-2 text-blue-800">{item.title}</h3>
+              <p className="text-gray-700">{item.description}</p>
+            </motion.div>
+          ))}
         </div>
       </section>
     </div>
