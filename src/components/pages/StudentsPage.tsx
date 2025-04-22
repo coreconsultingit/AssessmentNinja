@@ -12,7 +12,7 @@ const generateYearTopics = (subject: string, years: number[]) => {
 const years = [3, 4, 5, 6, 7, 8, 9, 10];
 const topics = [
   ...generateYearTopics("Science", years),
-  ...generateYearTopics("Math", years),
+  ...generateYearTopics("Maths", years),
   ...generateYearTopics("English", years),
   ...generateYearTopics("Geography", years),
   ...generateYearTopics("History", years)  

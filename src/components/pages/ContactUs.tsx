@@ -8,9 +8,12 @@ import { Toaster } from '../ui/toaster';
 import { motion } from 'framer-motion';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import { emailService } from "@/services/emailService";
+import { useNavigate } from "react-router-dom";
 
 const ContactUs: React.FC = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     subject: '',
@@ -62,12 +65,14 @@ const ContactUs: React.FC = () => {
     if (!validateForm()) return;
 
     try {
-      // await emailService.sendEmail(formData.email, formData.subject, formData.content);
+      console.log(formData.industry);
+      await emailService.sendEmail(formData.email, `${formData.subject} ${formData.industry}` , formData.content);
       toast({
         title: "Message Sent",
         description: "We'll get back to you soon!",
       });
       setFormData({ email: '', subject: '', industry: '', content: '' });
+      navigate("/"); // Redirect to home page
     } catch (error) {
       toast({
         title: "Error",
@@ -193,8 +198,9 @@ const ContactUs: React.FC = () => {
                     <SelectContent>
                       <SelectItem value="tech">Technology</SelectItem>
                       <SelectItem value="education">Education</SelectItem>
-                      <SelectItem value="healthcare">Healthcare</SelectItem>
                       <SelectItem value="finance">Finance</SelectItem>
+                      <SelectItem value="healthcare">Healthcare</SelectItem>                      
+                      <SelectItem value="promembership">Pro Membership</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
