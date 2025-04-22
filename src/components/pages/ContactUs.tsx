@@ -7,30 +7,38 @@ import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '../ui/toaster';
 import { motion } from 'framer-motion';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { useState } from "react";
+
 import { emailService } from "@/services/emailService";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const ContactUs: React.FC = () => {
-  const { toast } = useToast();
+
+  const location = useLocation();
+const { toast } = useToast();
+  
+  
   const navigate = useNavigate();
+  
+  // Get state from navigation
+  const { subject, industry, content } = location.state || {};
+
   const [formData, setFormData] = useState({
     email: '',
-    subject: '',
-    industry: '',
-    content: ''
+    subject: subject || '',
+    industry: industry || '',
+    content: content || ''
   });
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
   const [errors, setErrors] = useState({
     email: '',
     subject: '',
     content: ''
   });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
   const validateForm = () => {
     let isValid = true;
     const newErrors = { email: '', subject: '', content: '' };
@@ -198,6 +206,7 @@ const ContactUs: React.FC = () => {
                     <SelectContent>
                       <SelectItem value="tech">Technology</SelectItem>
                       <SelectItem value="education">Education</SelectItem>
+                      <SelectItem value="enterprise">Enterprise membership</SelectItem>
                       <SelectItem value="finance">Finance</SelectItem>
                       <SelectItem value="healthcare">Healthcare</SelectItem>                      
                       <SelectItem value="promembership">Pro Membership</SelectItem>

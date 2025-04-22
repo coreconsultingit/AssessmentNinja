@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import AssessmentPage from "./AssessmentPage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { LiveExaminerFlowSection } from "./LiveExaminerFlowSection";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ChevronRight } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
 const topics = [
   { label: "Angular", value: "angular" },
   { label: "AWS", value: "aws" },
@@ -29,7 +30,7 @@ const topics = [
 export default function HomePage() {
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
   const [popularTechIndex, setPopularTechIndex] = useState(0);
-
+  const navigate = useNavigate();
   const popularTechGroups = [
     ['React', 'Node.js', 'TypeScript', 'Next.js'],
     ['Python', 'Django', 'Flask', 'FastAPI'],
@@ -284,12 +285,57 @@ export default function HomePage() {
                     <p className="flex items-center gap-2"><span className="text-green-500">✓</span> Save & review assessment history</p>
                     <p className="flex items-center gap-2"><span className="text-green-500">✓</span> Priority support</p>
                   </div>
-                  <Button className="w-full mt-6 bg-blue-600 hover:bg-blue-700">
+                  <Button className="w-full mt-6 bg-blue-600 hover:bg-blue-700"
+                     onClick={() => 
+                      navigate('/contact-us', { 
+                        state: {
+                          subject: 'Pro membership inquiry',
+                          industry: 'promembership',
+                          content: 'We are interested in your pro membership.'
+                        }
+                      })
+                    }>
                     Upgrade to Pro
                   </Button>
                 </CardContent>
               </Card>
             </motion.div>
+
+             {/* Enterprise Plan */}
+  <motion.div whileHover={{ scale: 1.02 }} className="relative">
+    <Card className="h-full border-2 border-yellow-400 shadow-lg rounded-xl overflow-hidden">
+      <CardHeader className="bg-yellow-100 border-b border-yellow-300">
+        <CardTitle className="text-2xl text-yellow-800 flex items-center justify-between">
+          Enterprise Plan
+          <Badge className="bg-yellow-400 text-white">Custom</Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-6 space-y-4">
+        <div className="space-y-3 text-gray-700">
+          <p className="flex items-center gap-2"><span className="text-green-500">✓</span> All Pro features</p>
+          <p className="flex items-center gap-2"><span className="text-green-500">✓</span> Custom model training</p>
+          <p className="flex items-center gap-2"><span className="text-green-500">✓</span> Live exam monitoring</p>
+          <p className="flex items-center gap-2"><span className="text-green-500">✓</span> Team assessments</p>          
+          <p className="flex items-center gap-2"><span className="text-green-500">✓</span> Dedicated support</p>
+          <p className="flex items-center gap-2"><span className="text-green-500">✓</span> SLAs and onboarding</p>
+        </div>
+        <Button
+          className="w-full mt-6 bg-yellow-500 hover:bg-yellow-600 text-white"
+          onClick={() => 
+            navigate('/contact-us', { 
+              state: {
+                subject: 'Enterprise Plan Inquiry',
+                industry: 'enterprise',
+                content: 'We are interested in custom model training, monitored assessment, and other enterprise features.'
+              }
+            })
+          }
+        >
+          Contact Sales
+        </Button>
+      </CardContent>
+    </Card>
+  </motion.div>
           </div>
         </div>
       </section>
