@@ -99,8 +99,8 @@ export default function PrivacyPolicy() {
               <h2 className="text-xl font-semibold text-blue-800 mb-3">8. Contact Us</h2>
               <p>
                 For questions about this Privacy Policy, please contact us at{' '}
-                <a href="mailto:privacy@assessmentninja.com" className="text-blue-600 hover:underline">
-                  privacy@assessmentninja.com
+                <a href="mailto:info@coreconsultingit.com" className="text-blue-600 hover:underline">
+                info@coreconsultingit.com
                 </a>.
               </p>
             </section>
